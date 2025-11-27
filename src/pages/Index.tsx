@@ -1,5 +1,9 @@
 import ProductCard from "@/components/ProductCard";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import heroBanner from "@/assets/hero-banner.jpg";
 import straightLongDress from "@/assets/straight-long-dress.jpg";
 import straightShortDress from "@/assets/straight-short-dress.jpg";
@@ -10,6 +14,40 @@ import slitPeplum from "@/assets/slit-peplum.jpg";
 import weavingCloth from "@/assets/weaving-cloth.jpg";
 
 const Index = () => {
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const element = document.getElementById("flyer-content");
+      if (!element) return;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      pdf.save("Beauty-Empress-Christmas-Flyer.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   const products = [
     {
       image: straightLongDress,
@@ -57,7 +95,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Download PDF Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={isGeneratingPDF}
+          size="lg"
+          className="shadow-lg"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          {isGeneratingPDF ? "Generating..." : "Download PDF"}
+        </Button>
+      </div>
+
+      <div id="flyer-content">
+        {/* Hero Section */}
       <section className="relative h-[85vh] sm:h-[70vh] md:h-[70vh] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -140,6 +192,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 };
