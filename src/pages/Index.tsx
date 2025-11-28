@@ -154,7 +154,7 @@ const Index = () => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground px-2">
             Christmas Collection
           </h2>
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg text-black max-w-2xl mx-auto px-4">
             Exclusive discounts on all our premium designs. Limited time offer!
           </p>
         </div>
