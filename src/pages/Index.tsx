@@ -23,23 +23,38 @@ const Index = () => {
       if (!element) return;
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 0,
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
+        compress: true,
       });
 
       const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
       
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
       pdf.save("Beauty-Empress-Christmas-Flyer.pdf");
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -101,10 +116,10 @@ const Index = () => {
           onClick={handleDownloadPDF}
           disabled={isGeneratingPDF}
           size="lg"
-          className="shadow-lg"
+          className="shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
         >
-          <Download className="w-4 h-4 mr-2" />
-          {isGeneratingPDF ? "Generating..." : "Download PDF"}
+          <Download className="w-5 h-5 mr-2" />
+          {isGeneratingPDF ? "Generating Flyer..." : "Download Flyer"}
         </Button>
       </div>
 
